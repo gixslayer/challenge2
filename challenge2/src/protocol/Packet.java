@@ -19,6 +19,10 @@ public abstract class Packet {
 
     public abstract void deserialize(byte[] buffer);
 
+    public int getId() {
+        return id;
+    }
+
     public static Packet fromData(Integer[] data) {
         byte[] byteData = ByteUtils.intArrayToByteArray(data);
 
