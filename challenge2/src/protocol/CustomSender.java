@@ -15,7 +15,7 @@ public final class CustomSender implements IRDTProtocol {
 
     @Override
     public void run() {
-        Integer[] fileContents = Utils.getFileContents();
+        Integer[] intFileContents = Utils.getFileContents();
 
     }
 

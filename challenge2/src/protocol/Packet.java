@@ -1,6 +1,7 @@
 package protocol;
 
 import utils.ArgumentException;
+import utils.ByteUtils;
 
 public abstract class Packet {
     public static final int ID_BEGIN_TRANSFER = 0;
@@ -17,6 +18,17 @@ public abstract class Packet {
     public abstract byte[] serialize();
 
     public abstract void deserialize(byte[] buffer);
+
+    public static Packet fromData(Integer[] data) {
+        byte[] byteData = ByteUtils.intArrayToByteArray(data);
+
+        int packetId = ByteUtils.getIntFromBytes(byteData, 0);
+        Packet packet = fromId(packetId);
+
+        packet.deserialize(byteData);
+
+        return packet;
+    }
 
     public static Packet fromId(int id) {
         switch (id) {

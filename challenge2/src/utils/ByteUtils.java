@@ -53,4 +53,14 @@ public final class ByteUtils {
 
         return result;
     }
+
+    public static byte[] intArrayToByteArray(Integer[] value) {
+        byte[] result = new byte[value.length];
+
+        for (int i = 0; i < value.length; i++) {
+            result[i] = value[i].byteValue();
+        }
+
+        return result;
+    }
 }
