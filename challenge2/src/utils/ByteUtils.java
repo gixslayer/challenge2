@@ -19,10 +19,10 @@ public final class ByteUtils {
             throw new ArgumentException("offset", "cannot exceed array bounds");
         }
 
-        dest[offset + 0] = (byte) (value >> 32);
-        dest[offset + 1] = (byte) ((value >> 24) & 0xff);
-        dest[offset + 2] = (byte) ((value >> 16) & 0xff);
-        dest[offset + 3] = (byte) ((value >> 8) & 0xff);
+        dest[offset + 0] = (byte) (value >> 24);
+        dest[offset + 1] = (byte) ((value >> 16) & 0xff);
+        dest[offset + 2] = (byte) ((value >> 8) & 0xff);
+        dest[offset + 3] = (byte) ((value >> 0) & 0xff);
     }
 
     public static int getIntFromBytes(byte[] buffer, int offset) {
@@ -36,9 +36,9 @@ public final class ByteUtils {
 
         int value = 0;
 
-        value |= buffer[0] << 32;
-        value |= buffer[1] << 24;
-        value |= buffer[2] << 16;
+        value |= buffer[0] << 24;
+        value |= buffer[1] << 16;
+        value |= buffer[2] << 8;
         value |= buffer[3];
 
         return value;

@@ -23,7 +23,7 @@ public class Program {
     private static String password = "Welkom1";
 
     // Change to your protocol implementation
-    private static IRDTProtocol protocolImpl = new NaiveDataTransferProtocol();
+    private static IRDTProtocol protocolImpl = new CustomSender();
 
     // Challenge server address
     private static String serverAddress = "netsys.ewi.utwente.nl";
