@@ -8,6 +8,7 @@ public abstract class Packet {
     public static final int ID_DATA_FRAGMENT = 1;
     public static final int ID_ACK = 2;
     public static final int ID_BEGIN_ACK = 3;
+    public static final int ID_REQUEST_FRAGMENT = 4;
 
     protected final int id;
 
@@ -44,6 +45,8 @@ public abstract class Packet {
                 return new PacketAck();
             case ID_BEGIN_ACK:
                 return new PacketBeginAck();
+            case ID_REQUEST_FRAGMENT:
+                return new PacketRequestFragment();
         }
 
         throw new ArgumentException("id", "unknown id");

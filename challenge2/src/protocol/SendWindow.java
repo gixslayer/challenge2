@@ -21,9 +21,13 @@ public final class SendWindow {
 
     public void send() {
         int remaining = chunks;
+        int maxSend = 8;
+        long delay = 1500;
 
         while (remaining != 0) {
-            for (int i = 0; i < chunks; i++) {
+            int numberSend = 0;
+
+            for (int i = 0; i < chunks && numberSend < maxSend; i++) {
                 if (ackedList[i]) {
                     continue;
                 }
@@ -31,9 +35,19 @@ public final class SendWindow {
                 System.out.println("SENDING " + i);
 
                 networkLayer.sendPacket(packetCache[i]);
+                numberSend++;
+
+                try {
+                    Thread.sleep(125);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 
-            remaining -= receiveAcks(500);
+            remaining -= receiveAcks(delay);
+
+            System.out.println("REMAINING " + remaining);
 
             /* int ack = receiveAck(500);
 
