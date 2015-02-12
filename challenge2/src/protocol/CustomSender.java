@@ -11,7 +11,6 @@ public final class CustomSender implements IRDTProtocol {
 
     @Override
     public void TimeoutElapsed(Object tag) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -44,8 +43,7 @@ public final class CustomSender implements IRDTProtocol {
         packetCache = new PacketCache(packetBeginTransfer, dataFragments);
 
         beginTransfer();
-        //beginDataTransfer(chunks);
-        beginDataTransfer2();
+        beginDataTransfer();
     }
 
     @Override
@@ -70,46 +68,15 @@ public final class CustomSender implements IRDTProtocol {
         }
     }
 
-    private void beginDataTransfer2() {
-        SendWindow window = new SendWindow(0, networkLayer, packetCache);
+    private void beginDataTransfer() {
+        //SendWindow window = new SendWindow(0, networkLayer, packetCache);
 
-        window.send();
+        //window.send();
+
+        ReqResponder responder = new ReqResponder(networkLayer, packetCache.getDataFragments());
+
+        responder.run();
     }
-
-    /* private void beginDataTransfer(int chunks) {
-         int windowSize = 16;
-         int offset = 0;
-         int remaining = chunks;
-
-         while (offset < chunks) {
-             int count = remaining < windowSize ? remaining : windowSize;
-
-             sendDataFragments(offset, count);
-
-             offset += count;
-             remaining -= count;
-         }
-
-     }
-
-     private void sendDataFragments(int offset, int count) {
-         long timeout = 1500;
-
-         for (int i = 0; i < count; i++) {
-             while (true) {
-                 System.out.println("SENDING FRAGMENT " + (offset + i));
-
-                 networkLayer.sendPacket(packetCache.getDataFragment(offset + i));
-
-                 if (receiveAck(offset + i, timeout)) {
-                     System.out.println("RECEIVED ACK FOR FRAGMENT " + (offset + i));
-
-                     break;
-                 }
-             }
-         }
-
-     }*/
 
     private boolean receiveBeginAck(long timeout) {
         long start = System.currentTimeMillis();
@@ -128,26 +95,6 @@ public final class CustomSender implements IRDTProtocol {
             }
         }
     }
-
-    /*private boolean receiveAck(int index, long timeout) {
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            Packet packet = receivePacket();
-
-            if (packet != null && packet.getId() == Packet.ID_ACK) {
-                PacketAck packetAck = (PacketAck) packet;
-
-                return packetAck.getAckId() == index;
-            }
-
-            long elapsed = System.currentTimeMillis() - start;
-
-            if (elapsed > timeout) {
-                return false;
-            }
-        }
-    }*/
 
     private Packet receivePacket() {
         Integer[] data = networkLayer.receivePacket();

@@ -3,16 +3,12 @@ package protocol;
 import client.NetworkLayer;
 
 public final class SendWindow {
-    private int lastAcked;
-    private int windowSize;
     private NetworkLayer networkLayer;
     private Integer[][] packetCache;
     private boolean[] ackedList;
     private int chunks;
 
-    public SendWindow(int windowSize, NetworkLayer networkLayer, PacketCache packetCache) {
-        this.lastAcked = 0;
-        this.windowSize = windowSize;
+    public SendWindow(NetworkLayer networkLayer, PacketCache packetCache) {
         this.networkLayer = networkLayer;
         this.packetCache = packetCache.getDataFragments();
         this.chunks = this.packetCache.length;
@@ -40,7 +36,6 @@ public final class SendWindow {
                 try {
                     Thread.sleep(125);
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -48,15 +43,6 @@ public final class SendWindow {
             remaining -= receiveAcks(delay);
 
             System.out.println("REMAINING " + remaining);
-
-            /* int ack = receiveAck(500);
-
-             if (ack != -1 && !ackedList[ack]) {
-                 System.out.println("ACKED " + ack);
-
-                 ackedList[ack] = true;
-                 remaining--;
-             }*/
         }
     }
 
@@ -87,26 +73,6 @@ public final class SendWindow {
         }
 
         return acked;
-    }
-
-    private int receiveAck(long timeout) {
-        long start = System.currentTimeMillis();
-
-        while (true) {
-            Packet packet = receivePacket();
-
-            if (packet != null && packet.getId() == Packet.ID_ACK) {
-                PacketAck packetAck = (PacketAck) packet;
-
-                return packetAck.getAckId();
-            }
-
-            long elapsed = System.currentTimeMillis() - start;
-
-            if (elapsed > timeout) {
-                return -1;
-            }
-        }
     }
 
     private Packet receivePacket() {

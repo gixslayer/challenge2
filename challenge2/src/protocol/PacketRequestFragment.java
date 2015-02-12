@@ -29,4 +29,8 @@ public final class PacketRequestFragment extends Packet {
     public void deserialize(byte[] buffer) {
         index = ByteUtils.getIntFromBytes(buffer, 4);
     }
+
+    public int getIndex() {
+        return index;
+    }
 }
