@@ -5,7 +5,7 @@ import client.NetworkLayer;
 import client.Utils;
 
 public final class CustomSender implements IRDTProtocol {
-    private final int chunkSize = 128;
+    private final int chunkSize = 256;
     private NetworkLayer networkLayer;
     private PacketCache packetCache;
 
@@ -43,18 +43,120 @@ public final class CustomSender implements IRDTProtocol {
 
         packetCache = new PacketCache(packetBeginTransfer, dataFragments);
 
-        networkLayer.sendPacket(packetCache.getBeginTransfer());
-
-        // TODO: Wait for beginAck from receiver.
-
-        for (Integer[] dataFragment : packetCache.getDataFragments()) {
-            networkLayer.sendPacket(dataFragment);
-        }
+        beginTransfer();
+        //beginDataTransfer(chunks);
+        beginDataTransfer2();
     }
 
     @Override
     public void setNetworkLayer(NetworkLayer networkLayer) {
         this.networkLayer = networkLayer;
+    }
+
+    private void beginTransfer() {
+        boolean acked = false;
+        long timeout = 1000;
+
+        while (!acked) {
+            System.out.println("SENDING BEGIN");
+
+            networkLayer.sendPacket(packetCache.getBeginTransfer());
+
+            if (receiveBeginAck(timeout)) {
+                acked = true;
+
+                System.out.println("RECEIVED BEGIN ACK");
+            }
+        }
+    }
+
+    private void beginDataTransfer2() {
+        SendWindow window = new SendWindow(0, networkLayer, packetCache);
+
+        window.send();
+    }
+
+    private void beginDataTransfer(int chunks) {
+        int windowSize = 16;
+        int offset = 0;
+        int remaining = chunks;
+
+        while (offset < chunks) {
+            int count = remaining < windowSize ? remaining : windowSize;
+
+            sendDataFragments(offset, count);
+
+            offset += count;
+            remaining -= count;
+        }
+
+    }
+
+    private void sendDataFragments(int offset, int count) {
+        long timeout = 1500;
+
+        for (int i = 0; i < count; i++) {
+            while (true) {
+                System.out.println("SENDING FRAGMENT " + (offset + i));
+
+                networkLayer.sendPacket(packetCache.getDataFragment(offset + i));
+
+                if (receiveAck(offset + i, timeout)) {
+                    System.out.println("RECEIVED ACK FOR FRAGMENT " + (offset + i));
+
+                    break;
+                }
+            }
+        }
+
+    }
+
+    private boolean receiveBeginAck(long timeout) {
+        long start = System.currentTimeMillis();
+
+        while (true) {
+            Packet packet = receivePacket();
+
+            if (packet != null && packet.getId() == Packet.ID_BEGIN_ACK) {
+                return true;
+            }
+
+            long elapsed = System.currentTimeMillis() - start;
+
+            if (elapsed > timeout) {
+                return false;
+            }
+        }
+    }
+
+    private boolean receiveAck(int index, long timeout) {
+        long start = System.currentTimeMillis();
+
+        while (true) {
+            Packet packet = receivePacket();
+
+            if (packet != null && packet.getId() == Packet.ID_ACK) {
+                PacketAck packetAck = (PacketAck) packet;
+
+                return packetAck.getAckId() == index;
+            }
+
+            long elapsed = System.currentTimeMillis() - start;
+
+            if (elapsed > timeout) {
+                return false;
+            }
+        }
+    }
+
+    private Packet receivePacket() {
+        Integer[] data = networkLayer.receivePacket();
+
+        if (data == null) {
+            return null;
+        }
+
+        return Packet.fromData(data);
     }
 
 }

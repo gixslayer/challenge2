@@ -36,10 +36,11 @@ public final class ByteUtils {
 
         int value = 0;
 
-        value |= buffer[0] << 24;
-        value |= buffer[1] << 16;
-        value |= buffer[2] << 8;
-        value |= buffer[3];
+        // These & 0xff will 'convert' the signed bytes to their unsigned value in an integer type.
+        value |= (buffer[offset + 0] & 0xff) << 24;
+        value |= (buffer[offset + 1] & 0xff) << 16;
+        value |= (buffer[offset + 2] & 0xff) << 8;
+        value |= buffer[offset + 3] & 0xff;
 
         return value;
     }
