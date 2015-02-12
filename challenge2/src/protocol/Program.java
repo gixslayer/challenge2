@@ -14,6 +14,10 @@ import client.NetworkLayer;
  * @version 05-12-2013
  */
 public class Program {
+    /*
+     * Kevin Hetterscheid - s1490443
+     * Ciske Harsema      - s1482149
+     */
 
     // Change to your group number (use your student number)
     private static int groupId = 1490443;
